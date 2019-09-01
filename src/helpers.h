@@ -154,4 +154,16 @@ vector<double> getXY(double s, double d, const vector<double> &maps_s,
   return {x,y};
 }
 
+double check_car_speed(vector<double> sensor_data, int prev_size) {
+
+  double vx = sensor_data[3];
+  double vy = sensor_data[4];
+  double check_speed = sqrt(vx*vx + vy*vy); /* get the magnitude of vx&vy vector components */
+  double check_car_s = sensor_data[5];
+
+  check_car_s += ((double)prev_size * 0.02 * check_speed);
+
+  return check_car_s;
+
+}
 #endif  // HELPERS_H
