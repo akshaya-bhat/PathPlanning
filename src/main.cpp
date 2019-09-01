@@ -60,7 +60,7 @@ int main() {
                &map_waypoints_dx,&map_waypoints_dy, &lane, &ref_vel]
               (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                uWS::OpCode opCode) {
-  
+
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -70,12 +70,12 @@ int main() {
 
       if (s != "") {
         auto j = json::parse(s);
-        
+
         string event = j[0].get<string>();
-        
+
         if (event == "telemetry") {
           // j[1] is the data JSON object
-          
+
           // Main car's localization Data
           double car_x = j[1]["x"];
           double car_y = j[1]["y"];
@@ -108,20 +108,18 @@ int main() {
 
           int prev_size = previous_path_x.size();
 
-          if(prev_size > 0) {
-
+          if(prev_size > 0)
             car_s = end_path_s;
-          } 
 
           bool too_close = false;
 
-          for(int i=0; i<sensor_fusion.size(); i++) {
+          for(int i=0; i < sensor_fusion.size(); i++) {
 
             float d = sensor_fusion[i][6]; /* As defined in sensor_fusion vector in README */
             if(d > (4*lane) && d < (4*lane + 4)) { /* 4*lane is start of that lane and 4*lane+4 is end of that lane i.e 4m apart */
 
-              double vx = sensor_fusion[i][3];
-              double vy = sensor_fusion[i][4];
+              double vx = sensor_fusion[i][3]; /* car's x velocity in m/s */
+              double vy = sensor_fusion[i][4]; /* car's y velocity in m/s */
               double check_speed = sqrt(vx*vx + vy*vy); /* get the magnitude of vx&vy vector components */
               double check_car_s = sensor_fusion[i][5];
 
@@ -135,7 +133,7 @@ int main() {
               }
             }  
           }
-           
+
           if(too_close) {
             ref_vel -= 0.224;
           }
@@ -146,7 +144,7 @@ int main() {
           if(too_close) {
             int lane_busy[3] = {0};
             for(int i=0; i<sensor_fusion.size(); i++) {
-            
+
               double other_car_s;
               float other_car_d = sensor_fusion[i][6]; /* As defined in sensor_fusion vector in README */
               if(lane == 0) {
@@ -190,7 +188,6 @@ int main() {
               lane = 2;
           }
 
-
           /* List of widely spaced (x,y) waypoints evenly spaced at 30m */
           vector<double> ptsx;
           vector<double> ptsy;
@@ -212,7 +209,7 @@ int main() {
 
             ptsy.push_back(prev_car_y);
             ptsy.push_back(car_y);
-          
+
           }
           /* Use the existing previous path points */
           else {
@@ -225,13 +222,12 @@ int main() {
             double ref_y_prev = previous_path_y[prev_size - 2];
 
             ref_yaw = atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
-            
+
             ptsx.push_back(ref_x_prev);
             ptsx.push_back(ref_x);
 
             ptsy.push_back(ref_y_prev);
             ptsy.push_back(ref_y);
- 
           }
 
           /* Push 3 more points which are 30m spaced */
@@ -256,7 +252,6 @@ int main() {
 
             ptsx[i] = (shift_x * cos(0 - ref_yaw) - shift_y * sin(0 - ref_yaw));
             ptsy[i] = (shift_x * sin(0 - ref_yaw) + shift_y * cos(0 - ref_yaw));
-
           }
 
          /* Create A spline */
@@ -270,7 +265,6 @@ int main() {
 
            next_x_vals.push_back(previous_path_x[i]);
            next_y_vals.push_back(previous_path_y[i]);
-
          }
 
          double target_x = 30.0;
@@ -304,7 +298,6 @@ int main() {
 
            next_x_vals.push_back(x_point);
            next_y_vals.push_back(y_point);
-
          } 
 	
          //END //

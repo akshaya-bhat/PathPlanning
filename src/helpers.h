@@ -164,6 +164,5 @@ double check_car_speed(vector<double> sensor_data, int prev_size) {
   check_car_s += ((double)prev_size * 0.02 * check_speed);
 
   return check_car_s;
-
 }
 #endif  // HELPERS_H
